@@ -1,0 +1,50 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+*.json
+*.db-shm
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+*.mexw64
+
+# Executables
+*.exe
+*.out
+*.app
+*.exp
+
+
+# 
+*.db
+*.db-wal
+*.idb
+*.tlog
+*.log
+*.pdb
+*.ilk
+*.sdf
+*.opensdf
+*.suo
+*.vspx
+*.psess
+
+bin/*
+archive/
