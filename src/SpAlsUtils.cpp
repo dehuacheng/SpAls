@@ -44,6 +44,18 @@ void SpAlsUtils::reset(vector<vector<T>> &A)
     }
 }
 
+void SpAlsUtils::printMatrix(const vector<vector<T>> &A)
+{
+    cout << "print matrix of size " << A.size() << "-by-" << A[0].size() << endl;
+    for (auto const &row : A)
+    {
+        for (auto const &val : row)
+        {
+            cout << val << " ";
+        }
+        cout << endl;
+    }
+}
 void SpAlsUtils::invert(const vector<vector<T>> &A, vector<vector<T>> &goal, const int N_MAX)
 {
 
