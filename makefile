@@ -25,3 +25,6 @@ obj/%.o: src/%.cpp
 clean: 
 	rm ${OBJ_FILES}
 
+test:
+	./bin/main 
+
