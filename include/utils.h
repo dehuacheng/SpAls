@@ -1,5 +1,8 @@
 #pragma once
 typedef double T;
+class RNGeng;
+class SpAlsRNGeng;
+class SpAlsUtils;
 
 #include "pRNG.h"
 #include "asa007.h"
@@ -31,5 +34,6 @@ class SpAlsUtils
     static vector<size_t> getFroms(const int notFrom, const int NDIM);
     static void invert(const vector<vector<T>> &A, vector<vector<T>> &goal, const int N_MAX);
     static void reset(vector<vector<T>> &A);
+    static void reset(vector<T> &row);
     static void printMatrix(const vector<vector<T>> &A);
 };

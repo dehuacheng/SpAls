@@ -1,6 +1,6 @@
 #include "utils.h"
 #include "TensorData.h"
-#include "TensorDataSpAls.h"
+#include "TensorAls.h"
 #include "CPDecomp.h"
 
 #include <vector>

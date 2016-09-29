@@ -1,6 +1,6 @@
 #pragma once
+class Linalg;
 
-#include "CPDecomp.h"
 #include "CPDecomp.h"
 #include "TensorData.h"
 

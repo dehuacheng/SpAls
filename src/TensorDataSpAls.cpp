@@ -1,5 +1,5 @@
 #include "utils.h"
-#include "TensorDataSpAls.h"
+#include "TensorData.h"
 
 #include <iostream>
 #include <fstream>

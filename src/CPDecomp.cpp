@@ -23,6 +23,7 @@ CPDecomp::CPDecomp(const vector<size_t> &_dims, size_t _rank) : ro_dims(dims), r
     isFactorNormalized = vector<bool>(NDIM, false);
 
     isGramUpdated = vector<bool>(NDIM, false);
+    isGramInvUpdated = vector<bool>(NDIM, false);
     gramMtx = vector<vector<vector<T>>>(NDIM, vector<vector<T>>(rank, vector<T>(rank)));
     gramMtxInv = vector<vector<vector<T>>>(NDIM, vector<vector<T>>(rank, vector<T>(rank)));
 }
@@ -33,6 +34,9 @@ void CPDecomp::randInit(RNGeng *rng)
     for (int factorId = 0; factorId < dims.size(); ++factorId)
     {
         isFactorNormalized[factorId] = false;
+        isGramUpdated[factorId] = false;
+        isGramInvUpdated[factorId] = false;
+
         for (size_t i = 0; i < dims[factorId]; ++i)
         {
             for (size_t j = 0; j < rank; ++j)
@@ -51,6 +55,9 @@ void CPDecomp::normalizeFactor(const unsigned factorId)
     }
     else
     {
+        isGramUpdated[factorId] = false;
+        isGramInvUpdated[factorId] = false;
+
         vector<T> columnNorm(rank, 0);
         size_t nid = dims[factorId];
 

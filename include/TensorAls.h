@@ -48,3 +48,17 @@ class TensorCP_ALS
     void updateEntry(const unsigned factorId, const vector<size_t> &froms, const size_t i, const vector<vector<T>> &gramABInv, const T weight);
     vector<T> genRow(const unsigned factorId, const vector<size_t> &froms, const vector<size_t> &_loci, const vector<vector<T>> &pinv);
 };
+
+class TensorCP_SPALS : public TensorCP_ALS
+{
+  public:
+    TensorCP_SPALS(const TensorDataSpAls &_data, shared_ptr<CPDecomp> &_cpd);
+    virtual int updateFactor(const unsigned factorId);
+
+  protected:
+    // cmf for each factor
+    vector<vector<T>> lvrgScores;
+    vector<vector<double>> factorCmf;
+
+    void getLvrgScr(const unsigned factorId);
+};

@@ -1,8 +1,6 @@
 #include "TensorData.h"
 #include "SpAlsLinalg.h"
 #include "utils.h"
-// #include "spals.h"
-// typedef double T;
 
 #include <iostream>
 #include <fstream>

@@ -44,6 +44,11 @@ void SpAlsUtils::reset(vector<vector<T>> &A)
     }
 }
 
+void SpAlsUtils::reset(vector<T> &row)
+{
+    fill(row.begin(), row.end(), 0);
+}
+
 void SpAlsUtils::printMatrix(const vector<vector<T>> &A)
 {
     cout << "print matrix of size " << A.size() << "-by-" << A[0].size() << endl;
