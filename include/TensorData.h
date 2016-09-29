@@ -10,7 +10,8 @@ using namespace std;
 
 class TensorData
 {
-  friend class TensorCP_ALS;
+    friend class TensorCP_ALS;
+
   public:
     TensorData() : normT(-1), verbose(1), ro_loc(loc), ro_val(val), ro_nnz(nnz), ro_dims(dims) {}
     TensorData(const char *filename);
@@ -20,7 +21,7 @@ class TensorData
     void printDataStats();
     void printData();
 
-    T normData();
+    T normData() const;
 
     const vector<vector<size_t>> &ro_loc;
     const vector<T> &ro_val;

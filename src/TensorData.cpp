@@ -11,7 +11,7 @@
 
 using namespace std;
 
-TensorData::TensorData(const char *filename) : normT(-1), verbose(1), ro_loc(loc), ro_val(val), ro_nnz(nnz), ro_dims(dims)
+TensorData::TensorData(const char *filename) : verbose(1), ro_loc(loc), ro_val(val), ro_nnz(nnz), ro_dims(dims)
 {
     fstream fin;
     fin.open(filename, fstream::in);
@@ -58,6 +58,8 @@ TensorData::TensorData(const char *filename) : normT(-1), verbose(1), ro_loc(loc
 
     auto end = chrono::system_clock::now();
     diffTime += end - start;
+
+    normT = Linalg::Fnorm2(*this);
 
     if (verbose)
         printf("Data Loaded\n");
@@ -133,15 +135,9 @@ void TensorData::printDataStats()
     cout << "NNZ in tensor: " << nnz << endl;
 }
 
-T TensorData::normData()
+T TensorData::normData() const
 {
-    if (normT >= 0)
-        return normT;
-    else
-    {
-        normT = Linalg::Fnorm2(*this);
-        return normT;
-    }
+    return normT;
 }
 
 void TensorData::fromFile(const char *filename)
@@ -175,6 +171,8 @@ void TensorData::fromFile(const char *filename)
     val = vector<T>(nnz, 0.0);
     frlength = fread(val.data(), sizeof(double), nnz, f_in);
     fclose(f_in);
+
+    normT = Linalg::Fnorm2(*this);
 
     auto end = chrono::system_clock::now();
     diffTime += end - start;

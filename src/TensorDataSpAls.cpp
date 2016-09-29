@@ -133,6 +133,7 @@ void TensorDataSpAls::sortIndex(const int notFrom, size_t *s)
 void TensorDataSpAls::sortIndexes()
 {
     auto NDIM = dims.size();
+
     for (size_t i = 0; i < NDIM; ++i)
     {
         if (verbose)
@@ -150,7 +151,7 @@ void TensorDataSpAls::sortIndexes()
     }
 
     if (verbose)
-        puts("dumping results to datS mode, rerun with that file");
+        puts("Sorting fininshed");
 
     isSorted = true;
 }
