@@ -112,6 +112,21 @@ void CPDecomp::updateGram()
     }
 }
 
+void CPDecomp::updateGramInv(const unsigned factorId)
+{
+    if (isGramInvUpdated[factorId])
+    {
+        return;
+    }
+    else
+    {
+        updateGram(factorId);
+        SpAlsUtils::reset(gramMtxInv[factorId]);
+        SpAlsUtils::invert(gramMtx[factorId], gramMtxInv[factorId], rank);
+        isGramInvUpdated[factorId] = true;
+    }
+}
+
 void CPDecomp::updateGram(const unsigned factorId)
 {
     if (isGramUpdated[factorId])
@@ -120,18 +135,12 @@ void CPDecomp::updateGram(const unsigned factorId)
     }
     else
     {
-        for (int j0 = 0; j0 < rank; j0++)
-        {
-            for (size_t j1 = 0; j1 < rank; j1++)
-            {
-                gramMtx[factorId][j0][j1] = 0;
-            }
-        }
+        SpAlsUtils::reset(gramMtx[factorId]);
         size_t nid = dims[factorId];
-#pragma omp parallel for
-        for (int j0 = 0; j0 < rank; j0++)
+        for (size_t j0 = 0; j0 < rank; j0++)
         {
-            for (size_t i = 0; i < nid; i++)
+#pragma omp parallel for
+            for (int i = 0; i < nid; i++)
             {
                 for (size_t j1 = 0; j1 < rank; j1++)
                 {

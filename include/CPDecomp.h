@@ -35,10 +35,14 @@ class CPDecomp
     vector<vector<vector<T>>> factors;
     vector<T> lambdas;
     vector<size_t> dims;
+
     vector<bool> isFactorNormalized;
-    void updateGram(const unsigned factorId);
     vector<bool> isGramUpdated;
     vector<bool> isGramInvUpdated;
+
+    void updateGram(const unsigned factorId);
+    void updateGramInv(const unsigned factorId);
+
     vector<vector<vector<T>>> gramMtx;
     vector<vector<vector<T>>> gramMtxInv;
 
