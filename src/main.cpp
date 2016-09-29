@@ -4,6 +4,7 @@
 #include "CPDecomp.h"
 
 #include <vector>
+#include <memory>
 #include <iostream>
 #include <cmath>
 #include <omp.h>
@@ -15,8 +16,8 @@ using namespace std;
 int main(int argc, char *argv[])
 {
     // string inputFilename("../checkin.txt");
-    cout << "Book1.csv!" << endl;
-    string inputFilename("../Book1.csv");
+    string inputFilename("/home/dehua/code/data/tensorTest.csv");
+    cout << inputFilename << endl;
 
     TensorDataSpAls data(inputFilename.c_str());
     cout << "Book1.csv!" << endl;
@@ -28,10 +29,9 @@ int main(int argc, char *argv[])
     data.sortIndexes();
 
     cout << "Create cpd!" << endl;
-    size_t rank = 3;
-    CPDecomp cpd(data, rank);
+    size_t rank = 1;
+    shared_ptr<CPDecomp> cpd = make_shared<CPDecomp>(data, rank);
 
-    puts("Create cpd!");
     sitmo::prng_engine rngEngSeed;
     rngEngSeed.seed(1);
 
@@ -39,7 +39,23 @@ int main(int argc, char *argv[])
     SpAlsRNGeng rngEng(rngEngSeed);
 
     cout << "randInit cpd!" << endl;
-    cpd.randInit(&rngEng);
+    cpd->randInit(&rngEng);
 
+    cout << "Init. Tensor CP-ALS!" << endl;
+    TensorCP_ALS als(data, cpd);
+    cout << "TensorCP_ALs init done" << endl;
+
+    als.setErrorRecordInterval(1);
+    als.setVerbose(1);
+
+    for (int iter = 0; iter < 3; iter++)
+    {
+        // cout << "Iteration:\t" << iter << endl;
+        for (size_t factorId = 0; factorId < data.ro_dims.size(); factorId++)
+        {
+            // cout << "Update factor:\t" << factorId << endl;
+            als.updateFactor(factorId);
+        }
+    }
     return 0;
 }
