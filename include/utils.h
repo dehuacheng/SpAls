@@ -31,4 +31,5 @@ class SpAlsUtils
     static vector<size_t> getFroms(const int notFrom, const int NDIM);
     static void invert(const vector<vector<T>> &A, vector<vector<T>> &goal, const int N_MAX);
     static void reset(vector<vector<T>> &A);
+    static void printMatrix(const vector<vector<T>> &A);
 };
