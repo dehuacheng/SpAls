@@ -29,6 +29,7 @@ class CPDecomp
     void randInit(RNGeng *rng);
     void updateGram();
     const vector<vector<T>> &getGramMtx(const unsigned factorId);
+    const vector<vector<T>> &getGramMtxInv(const unsigned factorId);
     const vector<vector<vector<T>>> &getAllGramMtx();
 
   protected:

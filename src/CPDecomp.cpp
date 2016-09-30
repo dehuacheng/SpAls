@@ -165,6 +165,17 @@ const vector<vector<T>> &CPDecomp::getGramMtx(const unsigned factorId)
     return gramMtx[factorId];
 }
 
+const vector<vector<T>> &CPDecomp::getGramMtxInv(const unsigned factorId)
+{
+    if (factorId < 0 || factorId >= dims.size())
+    {
+        cout << "Dimension Index Out of Bound: " << factorId << endl;
+        exit(1);
+    }
+    updateGramInv(factorId);
+    return gramMtxInv[factorId];
+}
+
 const vector<vector<vector<T>>> &CPDecomp::getAllGramMtx()
 {
     updateGram();
