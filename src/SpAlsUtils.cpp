@@ -95,3 +95,20 @@ void SpAlsUtils::invert(const vector<vector<T>> &A, vector<vector<T>> &goal, con
     delete[] c;
     delete[] w;
 }
+
+unsigned SpAlsUtils::drawFromCmf(const vector<double> &cmf, T val)
+{
+    auto it = lower_bound(cmf.begin(), cmf.end(), val);
+    return it - cmf.begin();
+}
+
+vector<double> SpAlsUtils::pdf2Cmf(const vector<double> &pdf)
+{
+    vector<double> cmf(pdf.size());
+    cmf[0] = pdf[0];
+    for (size_t i = 1; i < cmf.size(); i++)
+    {
+        cmf[i] = cmf[i - 1] + pdf[i];
+    }
+    return cmf;
+}

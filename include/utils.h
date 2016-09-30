@@ -36,4 +36,6 @@ class SpAlsUtils
     static void reset(vector<vector<T>> &A);
     static void reset(vector<T> &row);
     static void printMatrix(const vector<vector<T>> &A);
+    static unsigned drawFromCmf(const vector<double> &cmf, T val);
+    static vector<double> pdf2Cmf(const vector<double> &pdf);
 };
