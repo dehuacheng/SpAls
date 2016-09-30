@@ -8,7 +8,7 @@ ifeq ($(UNAME), Linux)
 endif
 ifeq ($(UNAME), Darwin)
     CC=g++-5
-    LFLAGS = -fopenmp -L"/usr/local/Cellar/gcc/5.3.0/lib/gcc/5/libstdc++.a" -I"include"
+    LFLAGS = -fopenmp -L"/usr/local/Cellar/gcc/5.3.0/lib/gcc/5/" -I"include"
 endif
 
 CFLAGS =  -O2 -std=c++11 -I"include" -fopenmp
