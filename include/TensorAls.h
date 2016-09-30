@@ -53,13 +53,16 @@ class TensorCP_SPALS : public TensorCP_ALS
 {
   public:
     TensorCP_SPALS(const TensorDataSpAls &_data, shared_ptr<CPDecomp> &_cpd, SpAlsRNGeng &_rngEng);
+    virtual int updateFactor(const unsigned factorId, size_t count);
     virtual int updateFactor(const unsigned factorId);
+    void setRate(double _rate);
 
   protected:
+    double rate;
     SpAlsRNGeng &rngEng;
     // cmf for each factor
     vector<vector<T>> lvrgScores;
-    vector<vector<double>> factorCmf;
+    vector<vector<T>> factorCmf;
 
     void getLvrgScr(const unsigned factorId);
 };
