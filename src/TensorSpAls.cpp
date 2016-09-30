@@ -34,7 +34,8 @@ void TensorCP_SPALS::getLvrgScr(const unsigned factorId)
     SpAlsUtils::reset(lvrgScores[factorId]);
 
     auto &factor = cpd->factors[factorId];
-    auto &gramMtxInv = cpd->gramMtxInv[factorId];
+    auto &gramMtxInv = cpd->getGramMtxInv(factorId);
+
 #pragma omp parallel for
     for (int i = 0; i < nid; ++i)
     {
