@@ -10,7 +10,8 @@
 
 using namespace std;
 
-TensorCP_SPALS::TensorCP_SPALS(const TensorDataSpAls &_data, shared_ptr<CPDecomp> &_cpd) : TensorCP_ALS(_data, _cpd)
+TensorCP_SPALS::TensorCP_SPALS(const TensorDataSpAls &_data, shared_ptr<CPDecomp> &_cpd, SpAlsRNGeng &_rngEng)
+    : TensorCP_ALS(_data, _cpd), rngEng(_rngEng)
 {
     lvrgScores = vector<vector<T>>(data.ro_dims.size());
     factorCmf = vector<vector<double>>(data.ro_dims.size());
@@ -47,4 +48,5 @@ void TensorCP_SPALS::getLvrgScr(const unsigned factorId)
             }
         }
     }
+    SpAlsUtils::pdf2Cmf(lvrgScores[factorId], factorCmf[factorId]);
 }

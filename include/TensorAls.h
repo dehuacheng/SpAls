@@ -52,10 +52,11 @@ class TensorCP_ALS
 class TensorCP_SPALS : public TensorCP_ALS
 {
   public:
-    TensorCP_SPALS(const TensorDataSpAls &_data, shared_ptr<CPDecomp> &_cpd);
+    TensorCP_SPALS(const TensorDataSpAls &_data, shared_ptr<CPDecomp> &_cpd, SpAlsRNGeng &_rngEng);
     virtual int updateFactor(const unsigned factorId);
 
   protected:
+    SpAlsRNGeng &rngEng;
     // cmf for each factor
     vector<vector<T>> lvrgScores;
     vector<vector<double>> factorCmf;
