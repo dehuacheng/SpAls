@@ -48,20 +48,19 @@ class TensorDataSpAls : public TensorData
 
   public:
     TensorDataSpAls() : TensorData(), isSorted(false), isCmfReady(false){};
-    TensorDataSpAls(const char *filename) : TensorData(filename), isSorted(false), isCmfReady(false){};
+    TensorDataSpAls(const char *filename);
 
     void toFile(const char *filename) override;
     void fromFile(const char *filename) override;
     void printData(int did = -1);
 
     unsigned verbose;
-
     void sortIndexes();
 
     vector<vector<size_t>> sortArgs;
-    vector<T> dataCmf;
 
   protected:
+    vector<double> dataCmf;
     bool isSorted;
     bool isCmfReady;
 

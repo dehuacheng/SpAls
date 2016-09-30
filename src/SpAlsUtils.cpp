@@ -102,13 +102,18 @@ unsigned SpAlsUtils::drawFromCmf(const vector<double> &cmf, T val)
     return it - cmf.begin();
 }
 
-void SpAlsUtils::pdf2Cmf(const vector<double> &pdf, vector<double> &cmf)
+void SpAlsUtils::pdf2Cmf(const vector<T> &pdf, vector<T> &cmf)
 {
     reset(cmf);
     cmf[0] = pdf[0];
     for (size_t i = 1; i < cmf.size(); i++)
     {
         cmf[i] = cmf[i - 1] + pdf[i];
+    }
+    T total = cmf.back();
+    for (auto &v : cmf)
+    {
+        v /= total;
     }
     return;
 }
