@@ -117,3 +117,13 @@ void SpAlsUtils::pdf2Cmf(const vector<T> &pdf, vector<T> &cmf)
     }
     return;
 }
+
+void SpAlsUtils::printVector(const vector<T> &row)
+{
+    cout << "print vector of size " << row.size() << endl;
+    for (auto const &val : row)
+    {
+        cout << val << " ";
+    }
+    cout << endl;
+}

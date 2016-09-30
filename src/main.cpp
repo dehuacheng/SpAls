@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     data.sortIndexes();
 
     cout << "Create cpd!" << endl;
-    size_t rank = 3;
+    size_t rank = 5;
     shared_ptr<CPDecomp> cpd = make_shared<CPDecomp>(data, rank);
 
     sitmo::prng_engine rngEngSeed;
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     cpd->randInit(&rngEng);
 
     cout << "Init. Tensor CP-ALS!" << endl;
-    TensorCP_ALS als(data, cpd);
+    TensorCP_SPALS als(data, cpd, rngEng);
     cout << "TensorCP_ALs init done" << endl;
 
     als.setErrorRecordInterval(1);
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
         for (size_t factorId = 0; factorId < data.ro_dims.size(); factorId++)
         {
             // cout << "Update factor:\t" << factorId << endl;
-            als.updateFactor(factorId);
+            als.updateFactor(factorId, 100 * (1 + iter));
         }
     }
     return 0;

@@ -58,6 +58,7 @@ class TensorCP_SPALS : public TensorCP_ALS
     void setRate(double _rate);
 
   protected:
+    const TensorDataSpAls &dataSpals;
     double rate;
     SpAlsRNGeng &rngEng;
     // cmf for each factor
