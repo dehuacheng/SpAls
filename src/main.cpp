@@ -15,6 +15,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
+    omp_set_num_threads(4);
     // string inputFilename("../checkin.txt");
     string inputFilename("/home/dehua/code/data/tensorTest.csv");
     cout << inputFilename << endl;
@@ -29,7 +30,7 @@ int main(int argc, char *argv[])
     data.sortIndexes();
 
     cout << "Create cpd!" << endl;
-    size_t rank = 1;
+    size_t rank = 3;
     shared_ptr<CPDecomp> cpd = make_shared<CPDecomp>(data, rank);
 
     sitmo::prng_engine rngEngSeed;
@@ -48,7 +49,7 @@ int main(int argc, char *argv[])
     als.setErrorRecordInterval(1);
     als.setVerbose(1);
 
-    for (int iter = 0; iter < 3; iter++)
+    for (int iter = 0; iter < 100; iter++)
     {
         // cout << "Iteration:\t" << iter << endl;
         for (size_t factorId = 0; factorId < data.ro_dims.size(); factorId++)
