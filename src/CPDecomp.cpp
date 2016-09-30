@@ -85,6 +85,7 @@ void CPDecomp::normalizeFactor(const unsigned factorId)
                 factors[factorId][i][j] /= columnNorm[j];
             }
         }
+
         isFactorNormalized[factorId] = true;
     }
 }
@@ -137,9 +138,10 @@ void CPDecomp::updateGram(const unsigned factorId)
     {
         SpAlsUtils::reset(gramMtx[factorId]);
         size_t nid = dims[factorId];
+
+#pragma omp parallel for
         for (size_t j0 = 0; j0 < rank; j0++)
         {
-#pragma omp parallel for
             for (int i = 0; i < nid; i++)
             {
                 for (size_t j1 = 0; j1 < rank; j1++)
