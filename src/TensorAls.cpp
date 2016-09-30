@@ -10,7 +10,7 @@
 
 using namespace std;
 
-TensorCP_ALS::TensorCP_ALS(const TensorData &_data, shared_ptr<CPDecomp> &_cpd) : data(_data), cpd(_cpd), rank(_cpd->rank)
+TensorCP_ALS::TensorCP_ALS(const TensorData &_data, shared_ptr<CPDecomp> &_cpd) : currIter(0), data(_data), cpd(_cpd), rank(_cpd->rank)
 {
     gramABpdt = vector<vector<vector<T>>>(data.dims.size(), vector<vector<T>>(rank, vector<T>(rank)));
     gramABpdtInv = vector<vector<vector<T>>>(data.dims.size(), vector<vector<T>>(rank, vector<T>(rank)));
@@ -65,9 +65,14 @@ int TensorCP_ALS::updateFactor(const unsigned factorId)
     cpd->lambdas = vector<T>(rank, 1.0);
     SpAlsUtils::reset(cpd->factors[factorId]);
     cpd->isFactorNormalized[factorId] = false;
+    cpd->isGramUpdated[factorId] = false;
+    cpd->isGramInvUpdated[factorId] = false;
 
     //get inverse gram matrix
     prepareGramInv(factorId);
+    cpd->isFactorNormalized[factorId] = false;
+    cpd->isGramUpdated[factorId] = false;
+    cpd->isGramInvUpdated[factorId] = false;
 
     vector<size_t> froms = SpAlsUtils::getFroms(factorId, cpd->dims.size());
     for (size_t i = 0; i < data.nnz; i++)
@@ -81,7 +86,6 @@ int TensorCP_ALS::updateFactor(const unsigned factorId)
         cout << "print Factor Matrix Before Normalization:\n";
         SpAlsUtils::printMatrix(cpd->ro_factors[factorId]);
     }
-
     cpd->normalizeFactor(factorId);
     if (verbose > 2)
     {
@@ -89,8 +93,12 @@ int TensorCP_ALS::updateFactor(const unsigned factorId)
         SpAlsUtils::printMatrix(cpd->ro_factors[factorId]);
     }
 
-    cpd->getGramMtx(factorId);
-
+    cpd->updateGram(factorId);
+    if (verbose > 2)
+    {
+        cout << "\t\tgram matrix for factor after update:" << factorId << endl;
+        SpAlsUtils::printMatrix(cpd->getGramMtx(factorId));
+    }
     logAfterIter(factorId, stepStartTime);
     currIter++;
     return 0;
@@ -105,16 +113,22 @@ void TensorCP_ALS::prepareGramInv(const size_t factorId)
 
     SpAlsUtils::reset(gramAB);
     SpAlsUtils::reset(gramABInv);
-
-#pragma omp parallel for
-    for (int i = 0; i < rank; i++)
+    for (size_t i = 0; i < rank; i++)
     {
         for (size_t j = 0; j < rank; j++)
         {
             gramAB[i][j] = 1.0;
-            for (auto &factorId : froms)
+        }
+    }
+
+#pragma omp parallel for
+    for (int i = 0; i < rank; i++)
+    {
+        for (auto &fid : froms)
+        {
+            auto &gramMtx = cpd->getGramMtx(fid);
+            for (size_t j = 0; j < rank; j++)
             {
-                auto &gramMtx = cpd->getGramMtx(factorId);
                 gramAB[i][j] *= gramMtx[i][j];
             }
         }
@@ -124,6 +138,11 @@ void TensorCP_ALS::prepareGramInv(const size_t factorId)
     {
         cout << "print Gram Matrix:\n";
         SpAlsUtils::printMatrix(gramAB);
+        for (auto &fid : froms)
+        {
+            cout << "\t\tgram matrix for factor:" << fid << endl;
+            SpAlsUtils::printMatrix(cpd->getGramMtx(fid));
+        }
         cout << "print Inverse Gram Matrix:\n";
         SpAlsUtils::printMatrix(gramABInv);
     }
