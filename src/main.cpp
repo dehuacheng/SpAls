@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 {
     omp_set_num_threads(4);
     // string inputFilename("../checkin.txt");
-    string inputFilename("/home/dehua/code/data/tensorTest.csv");
+    string inputFilename(argv[1]);
     cout << inputFilename << endl;
 
     TensorDataSpAls data(inputFilename.c_str());
