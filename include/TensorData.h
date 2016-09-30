@@ -56,6 +56,7 @@ class TensorDataSpAls : public TensorData
 
     unsigned verbose;
     void sortIndexes();
+    void findEntryFromFactor(const size_t factorId, const vector<size_t> &ps, int &start, int &end) const;
 
     vector<vector<size_t>> sortArgs;
 
@@ -75,16 +76,16 @@ class TensorDataSpAls : public TensorData
         //, const int i2,
         const vector<size_t> &s,
         int &start,
-        int &end);
+        int &end) const;
 
     int findIndexLocBiSearchStart(
         const vector<size_t> &froms,
         const vector<size_t> &pivot,
         const vector<size_t> &s,
         int start,
-        int end);
+        int end) const;
 
-    inline bool EqThan(const vector<size_t> &rpivot, const vector<size_t> &lpivot, const vector<size_t> &froms)
+    inline bool EqThan(const vector<size_t> &rpivot, const vector<size_t> &lpivot, const vector<size_t> &froms) const
     {
         for (int i = 0; i < froms.size(); i++)
         {
@@ -100,7 +101,7 @@ class TensorDataSpAls : public TensorData
         return true;
     }
 
-    inline bool lessThan(const vector<size_t> &rpivot, const vector<size_t> &lpivot, const vector<size_t> &froms)
+    inline bool lessThan(const vector<size_t> &rpivot, const vector<size_t> &lpivot, const vector<size_t> &froms) const
     {
         for (int i = 0; i < froms.size(); i++)
         {

@@ -161,3 +161,118 @@ void TensorDataSpAls::sortIndexes()
 
     isSorted = true;
 }
+
+void TensorDataSpAls::findEntryFromFactor(const size_t factorId, const vector<size_t> &ps, int &start, int &end) const
+{
+    vector<size_t> froms = SpAlsUtils::getFroms(factorId, dims.size());
+    findIndexLoc(froms, ps, sortArgs[factorId], start, end);
+    return;
+}
+
+void TensorDataSpAls::findIndexLoc(
+    const vector<size_t> &froms,
+    const vector<size_t> &is,
+    const vector<size_t> &s,
+    int &start,
+    int &end) const
+{
+    // find start/end, such that start<= i <= end
+    // loc[s[i]][from1,from2] = [i1,i2]
+    // return start = -1 when empty;
+    auto NDIM = dims.size();
+    vector<size_t> pivot(NDIM, -1);
+
+    for (int i = 0; i < froms.size(); i++)
+    {
+        pivot[froms[i]] = is[i];
+    }
+
+    if (EqThan(pivot, loc[s[0]], froms))
+    {
+        start = 0;
+    }
+    else if (lessThan(pivot, loc[s[nnz - 1]], froms))
+    {
+        start = -1;
+    }
+    else if (lessThan(pivot, loc[s[0]], froms))
+    {
+        start = findIndexLocBiSearchStart(
+            froms,
+            pivot,
+            s,
+            1,
+            nnz - 1);
+    }
+    else
+    {
+        start = -1;
+    }
+
+    if (start >= 0)
+    {
+        int s1 = 0;
+        while (EqThan(pivot, loc[s[start + s1]], froms))
+        {
+            s1++;
+            if (start + s1 >= nnz)
+            {
+                break;
+            }
+        }
+        end = start + s1 - 1;
+        return;
+    }
+    else
+    {
+        // there is no matching entry.
+        return;
+    }
+}
+
+int TensorDataSpAls::findIndexLocBiSearchStart(
+    const vector<size_t> &froms,
+    const vector<size_t> &pivot,
+    const vector<size_t> &s,
+    int start,
+    int end) const
+{
+    if (start > end)
+    {
+        return -1;
+    }
+    else if (start == end)
+    {
+        if (EqThan(pivot, loc[s[start]], froms))
+        {
+            return start;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+    else
+    {
+        int mid = start + (end - start) / 2;
+
+        if (lessThan(pivot, loc[s[mid]], froms))
+        {
+            return findIndexLocBiSearchStart(
+                froms,
+                pivot,
+                s,
+                mid + 1,
+                end);
+        }
+        else
+        {
+            return findIndexLocBiSearchStart(
+                froms,
+                pivot,
+                s,
+                start,
+                mid);
+        }
+    }
+}
