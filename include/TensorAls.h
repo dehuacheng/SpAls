@@ -18,7 +18,7 @@ class TensorCP_ALS
   public:
     TensorCP_ALS(const TensorData &_data, shared_ptr<CPDecomp> &_cpd);
 
-    void randInit(RNGeng *rng);
+    // void randInit(RNGeng *rng);
     virtual int updateFactor(const unsigned factorId);
 
     void setErrorRecordInterval(const size_t _interval);
@@ -40,13 +40,14 @@ class TensorCP_ALS
     // pre allocated memory
     vector<vector<vector<T>>> gramABpdt;
     vector<vector<vector<T>>> gramABpdtInv;
+    vector<T> _row;
 
     void logAfterIter(const unsigned factorId, chrono::time_point<chrono::system_clock> &stepStartTime);
     chrono::time_point<chrono::system_clock> logBeforIter(const unsigned factorId);
 
     void prepareGramInv(const size_t factorId);
     void updateEntry(const unsigned factorId, const vector<size_t> &froms, const size_t i, const vector<vector<T>> &gramABInv, const T weight);
-    vector<T> genRow(const unsigned factorId, const vector<size_t> &froms, const vector<size_t> &_loci, const vector<vector<T>> &pinv);
+    void genRow(const unsigned factorId, const vector<size_t> &froms, const vector<size_t> &_loci, const vector<vector<T>> &pinv);
 };
 
 class TensorCP_SPALS : public TensorCP_ALS

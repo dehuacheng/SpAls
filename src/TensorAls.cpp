@@ -14,6 +14,7 @@ TensorCP_ALS::TensorCP_ALS(const TensorData &_data, shared_ptr<CPDecomp> &_cpd) 
 {
     gramABpdt = vector<vector<vector<T>>>(data.dims.size(), vector<vector<T>>(rank, vector<T>(rank)));
     gramABpdtInv = vector<vector<vector<T>>>(data.dims.size(), vector<vector<T>>(rank, vector<T>(rank)));
+    _row = vector<T>(rank);
 }
 
 chrono::time_point<chrono::system_clock> TensorCP_ALS::logBeforIter(const unsigned factorId)
@@ -62,6 +63,8 @@ int TensorCP_ALS::updateFactor(const unsigned factorId)
     auto stepStartTime = logBeforIter(factorId);
 
     // clear the
+    if (verbose > 2)
+        cout << "Start clear factor and lambdas" << endl;
     cpd->lambdas = vector<T>(rank, 1.0);
     SpAlsUtils::reset(cpd->factors[factorId]);
     cpd->isFactorNormalized[factorId] = false;
@@ -69,12 +72,19 @@ int TensorCP_ALS::updateFactor(const unsigned factorId)
     cpd->isGramInvUpdated[factorId] = false;
 
     //get inverse gram matrix
+    if (verbose > 2)
+        cout << "Start prepareGramInv" << endl;
     prepareGramInv(factorId);
     cpd->isFactorNormalized[factorId] = false;
     cpd->isGramUpdated[factorId] = false;
     cpd->isGramInvUpdated[factorId] = false;
 
+    if (verbose > 2)
+        cout << "Start Getting froms" << endl;
     vector<size_t> froms = SpAlsUtils::getFroms(factorId, cpd->dims.size());
+    if (verbose > 2)
+        cout << "Start Updating entries" << endl;
+
     for (size_t i = 0; i < data.nnz; i++)
     {
         updateEntry(factorId, froms, i, gramABpdtInv[factorId], 1.0);
@@ -106,11 +116,15 @@ int TensorCP_ALS::updateFactor(const unsigned factorId)
 
 void TensorCP_ALS::prepareGramInv(const size_t factorId)
 {
+    if (verbose > 2)
+        cout << " Get Froms :" << factorId << endl;
     vector<size_t> froms = SpAlsUtils::getFroms(factorId, cpd->dims.size());
 
     auto &gramAB = gramABpdt[factorId];
     auto &gramABInv = gramABpdtInv[factorId];
 
+    if (verbose > 2)
+        cout << " reset Gram and GramInv" << endl;
     SpAlsUtils::reset(gramAB);
     SpAlsUtils::reset(gramABInv);
     for (size_t i = 0; i < rank; i++)
@@ -120,19 +134,34 @@ void TensorCP_ALS::prepareGramInv(const size_t factorId)
             gramAB[i][j] = 1.0;
         }
     }
+    if (verbose > 2)
+    {
+        for (auto fid : froms)
+        {
+            cout << "fid: " << fid << endl;
+        }
+    }
+
+    for (auto fid : froms)
+    {
+        cpd->updateGram(fid);
+    }
 
 #pragma omp parallel for
     for (int i = 0; i < rank; i++)
     {
-        for (auto &fid : froms)
+        for (auto fid : froms)
         {
-            auto &gramMtx = cpd->getGramMtx(fid);
+            auto &gramMtx = cpd->gramMtx[fid];
             for (size_t j = 0; j < rank; j++)
             {
                 gramAB[i][j] *= gramMtx[i][j];
             }
         }
     }
+    if (verbose > 2)
+        cout << " done Gram" << endl;
+
     SpAlsUtils::invert(gramAB, gramABInv, rank);
     if (verbose > 2)
     {
@@ -151,23 +180,28 @@ void TensorCP_ALS::prepareGramInv(const size_t factorId)
 void TensorCP_ALS::updateEntry(const unsigned factorId, const vector<size_t> &froms,
                                const size_t i, const vector<vector<T>> &gramABInv, const T weight)
 {
-    vector<T> _row = genRow(factorId, froms, data.loc[i], gramABInv);
+    genRow(factorId, froms, data.loc[i], gramABInv);
     for (size_t j = 0; j < rank; ++j)
     {
         cpd->factors[factorId][data.loc[i][factorId]][j] += data.val[i] * _row[j] * weight;
     }
 }
 
-vector<T> TensorCP_ALS::genRow(const unsigned factorId, const vector<size_t> &froms, const vector<size_t> &_loci, const vector<vector<T>> &pinv)
+void TensorCP_ALS::genRow(const unsigned factorId, const vector<size_t> &froms, const vector<size_t> &_loci, const vector<vector<T>> &pinv)
 {
-    vector<T> row(rank, 0);
+
+    SpAlsUtils::reset(_row);
     for (size_t j = 0; j < rank; j++)
     {
-        T krpJ = cpd->factors[froms[0]][_loci[froms[0]]][j] * cpd->factors[froms[1]][_loci[froms[1]]][j];
+        T krpJ = 1.0;
+        for (auto &fid : froms)
+        {
+            krpJ *= cpd->factors[fid][_loci[fid]][j];
+        }
         for (size_t k = 0; k < rank; k++)
         {
-            row[k] += pinv[k][j] * krpJ;
+            _row[k] += pinv[k][j] * krpJ;
         }
     }
-    return row;
+    return;
 }
