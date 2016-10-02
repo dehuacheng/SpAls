@@ -92,6 +92,8 @@ void TensorData::toFile(const char *filename)
     fwrite(&NDIM, sizeof(size_t), 1, f_out);
     fwrite(dims.data(), sizeof(size_t), NDIM, f_out);
     fwrite(&nnz, sizeof(size_t), 1, f_out);
+    fwrite(&normT, sizeof(T), 1, f_out);
+
     for (size_t i = 0; i < nnz; ++i)
     {
         fwrite(loc[i].data(), sizeof(size_t), NDIM, f_out);
@@ -157,9 +159,10 @@ void TensorData::fromFile(const char *filename)
 
     size_t NDIM = 0;
     frlength = fread(&NDIM, sizeof(size_t), 1, f_in);
+    dims = vector<size_t>(NDIM);
     frlength = fread(dims.data(), sizeof(size_t), NDIM, f_in);
     frlength = fread(&nnz, sizeof(size_t), 1, f_in);
-
+    frlength = fread(&normT, sizeof(T), 1, f_in);
     loc = vector<vector<size_t>>(nnz, vector<size_t>(NDIM));
     for (size_t i = 0; i < nnz; ++i)
     {
