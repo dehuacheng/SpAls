@@ -76,6 +76,8 @@ void SpAlsUtils::invert(const vector<vector<T>> &A, vector<vector<T>> &goal, con
         for (int j = 0; j <= i; ++j)
         {
             a[k] = A[i][j];
+            if (i == j)
+                a[k] += 1e-9;
             k++;
         }
     }
