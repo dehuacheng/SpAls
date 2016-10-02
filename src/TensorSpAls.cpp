@@ -117,13 +117,19 @@ int TensorCP_SPALS::updateFactor(const unsigned factorId)
 {
 
     size_t count = pow(rank, data.ro_dims.size() - 1) * rate;
-    for (auto &fid : data.ro_dims)
+    if (verbose)
+        cout << " Sample : " << count << endl;
+    for (int fid = 0; fid < data.ro_dims.size(); fid++)
     {
         if (fid != factorId)
         {
             count *= max(1, (int)(log(data.ro_dims[fid])));
+            if (verbose)
+                cout << " Sample : " << count << " fid: " << fid << " dim: " << data.ro_dims[fid] << endl;
         }
     }
+    if (verbose)
+        cout << " Sample : " << count << endl;
     return updateFactor(factorId, count);
 }
 
