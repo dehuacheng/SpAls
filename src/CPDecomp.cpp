@@ -12,7 +12,6 @@ CPDecomp::CPDecomp(const TensorData &_data, size_t _rank) : CPDecomp(_data.ro_di
 
 CPDecomp::CPDecomp(const vector<size_t> &_dims, size_t _rank) : ro_dims(dims), ro_factors(factors), ro_lambdas(lambdas), rank(_rank), dims(_dims)
 {
-    dims = dims;
     auto NDIM = dims.size();
     factors = vector<vector<vector<T>>>(NDIM);
     for (int factorId = 0; factorId < NDIM; factorId++)
@@ -44,6 +43,8 @@ void CPDecomp::randInit(RNGeng *rng)
                 factors[factorId][i][j] = rng->nextRNG() - 0.5;
             }
         }
+        normalizeFactor(factorId);
+        updateGram(factorId);
     }
 }
 
