@@ -18,7 +18,7 @@ CPDecomp::CPDecomp(const vector<size_t> &_dims, size_t _rank) : ro_dims(dims), r
     {
         factors[factorId] = vector<vector<T>>(dims[factorId], vector<T>(rank));
     }
-    lambdas = vector<T>(NDIM, 1.0);
+    lambdas = vector<T>(rank, 1.0);
     isFactorNormalized = vector<bool>(NDIM, false);
 
     isGramUpdated = vector<bool>(NDIM, false);
