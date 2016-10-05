@@ -16,6 +16,7 @@ TensorCP_SPALSOMP::TensorCP_SPALSOMP(const TensorDataSpAls &_data, shared_ptr<CP
 {
     // get balance;
     getBalanceDist();
+    _rows = vector<vector<T>>(nthread, vector<T>(rank));
 }
 
 int TensorCP_SPALSOMP::updateFactorAls(const unsigned factorId)
@@ -52,7 +53,7 @@ int TensorCP_SPALSOMP::updateFactorAls(const unsigned factorId)
         for (int k = 0, n = bl.size(); k < n; ++k)
         {
             i = bl[k + 1];
-            updateEntry(factorId, froms, i, gramABpdtInv[factorId], 1.0);
+            updateEntry(factorId, froms, i, gramABpdtInv[factorId], 1.0, _rows[tid]);
         }
     }
 
@@ -162,7 +163,7 @@ int TensorCP_SPALSOMP::updateFactor(const unsigned factorId, size_t count)
             for (int i = 0, ns = taskes[tid][ttid].size(); i < ns; i++)
             {
                 int p = taskes[tid][ttid][i];
-                updateEntry(factorId, froms, p, gramABpdtInv[factorId], weights[tid][ttid][i]);
+                updateEntry(factorId, froms, p, gramABpdtInv[factorId], weights[tid][ttid][i], _rows[ttid]);
             }
         }
     }

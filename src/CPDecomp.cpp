@@ -27,12 +27,13 @@ CPDecomp::CPDecomp(const vector<size_t> &_dims, size_t _rank) : ro_dims(dims), r
     gramMtxInv = vector<vector<vector<T>>>(NDIM, vector<vector<T>>(rank, vector<T>(rank)));
 }
 
-void CPDecomp::randInit(RNGeng *rng)
+void CPDecomp::randInit(SpAlsRNGeng *rng)
 {
 #pragma omp parallel for
     for (int factorId = 0; factorId < dims.size(); ++factorId)
     {
         int tid = omp_get_thread_num();
+        cout << "tid:" << tid << endl;
         isFactorNormalized[factorId] = false;
         isGramUpdated[factorId] = false;
         isGramInvUpdated[factorId] = false;

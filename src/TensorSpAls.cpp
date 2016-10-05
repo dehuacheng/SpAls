@@ -82,7 +82,7 @@ int TensorCP_SPALS::updateFactor(const unsigned factorId, size_t count)
             for (int i = start; i <= end; i++)
             {
                 int p = dataSpals.sortArgs[factorId][i];
-                updateEntry(factorId, froms, p, gramABpdtInv[factorId], weight);
+                updateEntry(factorId, froms, p, gramABpdtInv[factorId], weight, _row);
             }
         }
     }

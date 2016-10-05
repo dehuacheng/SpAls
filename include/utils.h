@@ -20,8 +20,12 @@ class RNGeng
 class SpAlsRNGeng : public RNGeng
 {
   public:
-    SpAlsRNGeng(sitmo::prng_engine _tmpeng) : tmpeng(_tmpeng) {}
+    SpAlsRNGeng(size_t seed = 0)
+    {
+        tmpeng.seed(seed);
+    }
     double nextRNG() override;
+    void seed(size_t seed) { tmpeng.seed(seed); }
 
   protected:
     sitmo::prng_engine tmpeng;

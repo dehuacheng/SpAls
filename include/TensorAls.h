@@ -46,8 +46,8 @@ class TensorCP_ALS
     chrono::time_point<chrono::system_clock> logBeforIter(const unsigned factorId);
 
     void prepareGramInv(const size_t factorId);
-    void updateEntry(const unsigned factorId, const vector<size_t> &froms, const size_t i, const vector<vector<T>> &gramABInv, const T weight);
-    void genRow(const unsigned factorId, const vector<size_t> &froms, const vector<size_t> &_loci, const vector<vector<T>> &pinv);
+    void updateEntry(const unsigned factorId, const vector<size_t> &froms, const size_t i, const vector<vector<T>> &gramABInv, const T weight, vector<T> &row);
+    void genRow(const unsigned factorId, const vector<size_t> &froms, const vector<size_t> &_loci, const vector<vector<T>> &pinv, vector<T> &row);
 };
 
 class TensorCP_SPALS : public TensorCP_ALS
@@ -87,4 +87,6 @@ class TensorCP_SPALSOMP : public TensorCP_SPALS
     // with subsampling
     vector<vector<size_t>> bDistSPALS;
     // bDistSPALS[factorId][dimension_id] = thread_id
+
+    vector<vector<T>> _rows;
 };

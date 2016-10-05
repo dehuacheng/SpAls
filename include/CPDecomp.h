@@ -27,7 +27,7 @@ class CPDecomp
 
     T eval(const vector<size_t> &ind) const;
 
-    void randInit(RNGeng *rng);
+    void randInit(SpAlsRNGeng *rng);
     void updateGram();
     const vector<vector<T>> &getGramMtx(const unsigned factorId);
     const vector<vector<T>> &getGramMtxInv(const unsigned factorId);
