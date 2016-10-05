@@ -1,5 +1,7 @@
 #pragma once
 class TensorCP_ALS;
+class TensorCP_SPALS;
+class TensorCP_SPALSOMP;
 
 #include "pRNG.h"
 #include "utils.h"

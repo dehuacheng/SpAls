@@ -1,12 +1,8 @@
-#include "utils.h"
-#include "TensorData.h"
-#include "TensorAls.h"
-#include "CPDecomp.h"
+#include "spals.h"
 
 #include <vector>
 #include <memory>
 #include <iostream>
-#include <cmath>
 #include <omp.h>
 
 // #include "spals.h"
