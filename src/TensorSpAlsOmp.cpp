@@ -99,60 +99,76 @@ int TensorCP_SPALSOMP::updateFactor(const unsigned factorId, size_t count)
     size_t hitR = 0;
     size_t hitNZ = 0;
 
-    //     vector<vector<vector<int>>> taskes(nthread, vector<vector<int>>(nthread));
-    //     vector<vector<vector<double>>> weights(nthread, vector<vector<double>>(nthread));
+    const auto &sortArgs = dataSpals.sortArgs;
+    const auto &loc = data.ro_loc;
 
-    // #pragma omp parallel for reduction(+ : hitR, hitNZ)
-    //     for (int tid = 0; tid < nthread; ++tid)
-    //     {
-    //         vector<vector<int>> &taskT = taskes[tid];
-    //         vector<vector<double>> &weightsT = weights[tid];
-    //     }
+    vector<vector<vector<int>>> taskes(nthread, vector<vector<int>>(nthread));
+    vector<vector<vector<double>>> weights(nthread, vector<vector<double>>(nthread));
 
-    for (size_t iter = 0; iter < count; iter++)
+#pragma omp parallel for reduction(+ : hitR, hitNZ)
+    for (int tid = 0; tid < nthread; ++tid)
     {
-        // sample from krp
-        vector<size_t> ps;
-        for (auto &fid : froms)
-        {
-            // SpAlsUtils::printVector(factorCmf[fid]);
-            ps.push_back(SpAlsUtils::drawFromCmf(factorCmf[fid], rngEng->nextRNG()));
-            if (verbose > 3)
-                cout << fid << "\t" << ps.back() << endl;
-        }
+        vector<vector<int>> &taskT = taskes[tid];
+        vector<vector<double>> &weightsT = weights[tid];
 
-        //get weight
-        double weight = 1.0 / count;
-        for (size_t it = 0; it < froms.size(); it++)
+        for (int iter = (count / nthread + 1) * tid; iter < (count / nthread + 1) * (tid + 1) && iter < count; ++iter)
         {
-            if (ps[it] == 0)
+            vector<size_t> ps;
+            for (auto &fid : froms)
             {
-                weight /= factorCmf[froms[it]][0];
+                // SpAlsUtils::printVector(factorCmf[fid]);
+                ps.push_back(SpAlsUtils::drawFromCmf(factorCmf[fid], rngEng[tid].nextRNG()));
+                if (verbose > 3)
+                    cout << fid << "\t" << ps.back() << endl;
             }
-            else
+
+            double weight = 1.0 / count;
+            for (size_t it = 0; it < froms.size(); it++)
             {
-                weight /= factorCmf[froms[it]][ps[it]] - factorCmf[froms[it]][ps[it] - 1];
+                if (ps[it] == 0)
+                {
+                    weight /= factorCmf[froms[it]][0];
+                }
+                else
+                {
+                    weight /= factorCmf[froms[it]][ps[it]] - factorCmf[froms[it]][ps[it] - 1];
+                }
             }
-        }
 
-        // get corresponding entries
-        int start = -1;
-        int end = -1;
-        dataSpals.findEntryFromFactor(factorId, ps, start, end);
+            // get corresponding entries
+            int start = -1;
+            int end = -1;
+            dataSpals.findEntryFromFactor(factorId, ps, start, end);
 
-        if (start >= 0)
-        {
-            hitR++;
-            hitNZ += end - start + 1;
-            for (int i = start; i <= end; i++)
+            if (start >= 0)
             {
-                int p = dataSpals.sortArgs[factorId][i];
-                updateEntry(factorId, froms, p, gramABpdtInv[factorId], weight);
+                hitR++;
+                hitNZ += end - start + 1;
+                for (int i = start; i <= end; i++)
+                {
+                    int ttid = bDistSPALS[factorId][loc[sortArgs[factorId][i]][factorId]];
+                    taskes[tid][ttid].push_back(sortArgs[factorId][i]);
+                    weights[tid][ttid].push_back(weight);
+                }
             }
         }
     }
+
+#pragma omp parallel for
+    for (int ttid = 0; ttid < nthread; ++ttid)
+    {
+        for (int tid = 0; tid < nthread; ++tid)
+        {
+            for (int i = 0, ns = taskes[tid][ttid].size(); i < ns; i++)
+            {
+                int p = taskes[tid][ttid][i];
+                updateEntry(factorId, froms, p, gramABpdtInv[factorId], weights[tid][ttid][i]);
+            }
+        }
+    }
+
     if (verbose)
-        cout << hitR << "\t" << hitNZ << " " << count << endl;
+        cout << "Sample NNZ Rows:" << hitR << "\tSample NNZ Entries:" << hitNZ << "\tSample NNZ Rows:" << count << endl;
     //postprocessing of the new factor
     if (verbose > 2)
     {
@@ -180,6 +196,9 @@ int TensorCP_SPALSOMP::updateFactor(const unsigned factorId, size_t count)
 
 int TensorCP_SPALSOMP::updateFactor(const unsigned factorId)
 {
+    if (rate <= 0)
+        return updateFactorAls(factorId);
+
     size_t count = pow(rank, data.ro_dims.size() - 1) * rate;
     for (int fid = 0; fid < data.ro_dims.size(); fid++)
     {
