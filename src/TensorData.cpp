@@ -1,5 +1,4 @@
 #include "TensorData.h"
-#include "SpAlsLinalg.h"
 #include "utils.h"
 
 #include <iostream>

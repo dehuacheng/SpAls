@@ -4,8 +4,6 @@ class TensorDataSpAls;
 
 #include "utils.h"
 #include "TensorAls.h"
-// #include "TensorSpAls.h"
-
 #include <vector>
 
 using namespace std;

@@ -2,7 +2,6 @@
 #include "TensorAls.h"
 #include "CPDecomp.h"
 #include "TensorData.h"
-#include "SpAlsLinalg.h"
 
 #include <memory>
 #include <vector>
