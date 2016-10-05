@@ -45,6 +45,7 @@ class TensorData
 class TensorDataSpAls : public TensorData
 {
     friend class TensorCP_SpALS;
+    friend class TensorCP_SpALSOMP;
 
   public:
     TensorDataSpAls() : TensorData(), isSorted(false), isCmfReady(false){};

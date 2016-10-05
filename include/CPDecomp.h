@@ -12,6 +12,7 @@ class CPDecomp
 {
     friend class TensorCP_ALS;
     friend class TensorCP_SPALS;
+    friend class TensorCP_SPALSOMP;
 
   public:
     CPDecomp() : ro_dims(dims), ro_factors(factors), ro_lambdas(lambdas) {}

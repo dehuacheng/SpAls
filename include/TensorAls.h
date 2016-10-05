@@ -68,3 +68,14 @@ class TensorCP_SPALS : public TensorCP_ALS
 
     void getLvrgScr(const unsigned factorId);
 };
+
+class TensorCP_SPALSOMP : public TensorCP_SPALS
+{
+  public:
+    TensorCP_SPALSOMP(const TensorDataSpAls &_data, shared_ptr<CPDecomp> &_cpd, SpAlsRNGeng &_rngEng, size_t _nthread);
+    virtual int updateFactor(const unsigned factorId, size_t count);
+    virtual int updateFactor(const unsigned factorId);
+    const size_t nthread;
+
+  protected:
+};
