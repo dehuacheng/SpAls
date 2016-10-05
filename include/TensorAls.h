@@ -75,7 +75,16 @@ class TensorCP_SPALSOMP : public TensorCP_SPALS
     TensorCP_SPALSOMP(const TensorDataSpAls &_data, shared_ptr<CPDecomp> &_cpd, SpAlsRNGeng &_rngEng, size_t _nthread);
     virtual int updateFactor(const unsigned factorId, size_t count);
     virtual int updateFactor(const unsigned factorId);
+    virtual int updateFactorAls(const unsigned factorId);
     const size_t nthread;
 
   protected:
+    void getBalanceDist();
+    // required only when OpenMP
+    // without subsampling
+    vector<vector<vector<size_t>>> bDistALS;
+    // bDistALS[factorId][thread_id] is all the data_id that bDistSPALS[factorId][loc[thread_id][dimension_id]] = thread_id
+    // with subsampling
+    vector<vector<size_t>> bDistSPALS;
+    // bDistSPALS[factorId][dimension_id] = thread_id
 };
