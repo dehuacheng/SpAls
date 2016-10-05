@@ -5,14 +5,10 @@
 #include <iostream>
 #include <omp.h>
 
-// #include "spals.h"
-
 using namespace std;
 
 int main(int argc, char *argv[])
 {
-
-    // string inputFilename("../checkin.txt");
     string inputFilename(argv[1]);
     size_t rank = 10;
     size_t nthread = 8;
@@ -23,7 +19,6 @@ int main(int argc, char *argv[])
     data.verbose = 0;
     data.printDataStats();
 
-    // cout << data.normData() << endl;
     cout << "Sorting Indexes!" << endl;
     data.sortIndexes();
 
@@ -36,7 +31,6 @@ int main(int argc, char *argv[])
     for (int tid = 0; tid < nthread; tid++)
     {
         rngEng[tid].seed((tid + 1984) * rand());
-        // rngEng.push_back(move(SpAlsRNGeng(tid)));
     }
 
     cout << "randInit cpd!" << endl;
@@ -44,7 +38,6 @@ int main(int argc, char *argv[])
 
     cout << "Init. Tensor CP-ALS!" << endl;
     TensorCP_SPALSOMP als(data, cpd, rngEng.data(), nthread);
-    // TensorCP_ALS als(data, cpd);
     cout << "TensorCP_ALs init done" << endl;
 
     als.setErrorRecordInterval(1);
@@ -52,12 +45,9 @@ int main(int argc, char *argv[])
     als.setRate(2.0);
     for (int iter = 0; iter < 3; iter++)
     {
-        // cout << "Iteration:\t" << iter << endl;
         for (size_t factorId = 0; factorId < data.ro_dims.size(); factorId++)
         {
-            // cout << "Update factor:\t" << factorId << endl;
             als.updateFactor(factorId);
-            // return 0;
         }
     }
     return 0;
