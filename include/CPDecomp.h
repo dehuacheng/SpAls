@@ -18,7 +18,8 @@ class CPDecomp
     CPDecomp() : ro_dims(dims), ro_factors(factors), ro_lambdas(lambdas) {}
     CPDecomp(const TensorData &_data, size_t _rank);
     CPDecomp(const vector<size_t> &_dims, size_t _rank);
-    ~CPDecomp(){};
+    void toFile(const char *filename);
+    void fromFile(const char *filename);
 
     size_t rank;
     const vector<vector<vector<T>>> &ro_factors;
@@ -32,6 +33,7 @@ class CPDecomp
     const vector<vector<T>> &getGramMtx(const unsigned factorId);
     const vector<vector<T>> &getGramMtxInv(const unsigned factorId);
     const vector<vector<vector<T>>> &getAllGramMtx();
+    unsigned verbose = 0;
 
   protected:
     vector<vector<vector<T>>> factors;

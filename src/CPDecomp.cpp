@@ -20,7 +20,93 @@ CPDecomp::CPDecomp(const vector<size_t> &_dims, size_t _rank) : ro_dims(dims), r
     }
     lambdas = vector<T>(rank, 1.0);
     isFactorNormalized = vector<bool>(NDIM, false);
+    isGramUpdated = vector<bool>(NDIM, false);
+    isGramInvUpdated = vector<bool>(NDIM, false);
+    gramMtx = vector<vector<vector<T>>>(NDIM, vector<vector<T>>(rank, vector<T>(rank)));
+    gramMtxInv = vector<vector<vector<T>>>(NDIM, vector<vector<T>>(rank, vector<T>(rank)));
+}
 
+void CPDecomp::toFile(const char *filename)
+{
+    if (verbose)
+        printf("Saving Data to file: %s\n", filename);
+
+    chrono::duration<double> diffTime(0);
+    auto start = chrono::system_clock::now();
+
+    FILE *f_out = fopen(filename, "w");
+    if (f_out == NULL)
+    {
+        printf("Cannot open file: %s \n", filename);
+        exit(1);
+    }
+
+    fwrite(&rank, sizeof(size_t), 1, f_out);
+
+    auto NDIM = dims.size();
+    fwrite(&NDIM, sizeof(size_t), 1, f_out);
+    fwrite(dims.data(), sizeof(size_t), NDIM, f_out);
+    // save lambdas
+    fwrite(lambdas.data(), sizeof(T), rank, f_out);
+    // save factors
+    for (int fid = 0; fid < NDIM; fid++)
+    {
+        for (int vid = 0; vid < dims[fid]; vid++)
+        {
+            fwrite(factors[fid][vid].data(), sizeof(T), rank, f_out);
+        }
+    }
+    fclose(f_out);
+
+    auto end = chrono::system_clock::now();
+    diffTime += end - start;
+    if (verbose)
+        printf("Time elapsed saving data: %f seconds\n", diffTime.count());
+}
+
+void CPDecomp::fromFile(const char *filename)
+{
+    size_t frlength;
+    chrono::duration<double> diffTime(0);
+    auto start = chrono::system_clock::now();
+
+    FILE *f_in;
+    f_in = fopen(filename, "r");
+    if (f_in == NULL)
+    {
+        printf("Cannot open file: %s \n", filename);
+        exit(1);
+    }
+
+    if (verbose)
+        cout << "Loading processed data from " << filename << endl;
+
+    frlength = fread(&rank, sizeof(size_t), 1, f_in);
+    size_t NDIM = 0;
+    frlength = fread(&NDIM, sizeof(size_t), 1, f_in);
+
+    dims = vector<size_t>(NDIM);
+    frlength = fread(dims.data(), sizeof(size_t), NDIM, f_in);
+
+    lambdas = vector<T>(rank);
+    frlength = fread(lambdas.data(), sizeof(T), rank, f_in);
+
+    factors = vector<vector<vector<T>>>(NDIM);
+    for (int fid = 0; fid < NDIM; fid++)
+    {
+        factors[fid] = vector<vector<T>>(dims[fid], vector<T>(rank));
+        for (int vid = 0; vid < dims[fid]; vid++)
+        {
+            frlength = fread(factors[fid][vid].data(), sizeof(T), rank, f_in);
+        }
+    }
+    fclose(f_in);
+    auto end = chrono::system_clock::now();
+    diffTime += end - start;
+    if (verbose)
+        printf("Time elapsed loading data: %f seconds\n", diffTime.count());
+
+    isFactorNormalized = vector<bool>(NDIM, false);
     isGramUpdated = vector<bool>(NDIM, false);
     isGramInvUpdated = vector<bool>(NDIM, false);
     gramMtx = vector<vector<vector<T>>>(NDIM, vector<vector<T>>(rank, vector<T>(rank)));
