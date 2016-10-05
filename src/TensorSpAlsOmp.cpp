@@ -11,7 +11,7 @@
 
 using namespace std;
 
-TensorCP_SPALSOMP::TensorCP_SPALSOMP(const TensorDataSpAls &_data, shared_ptr<CPDecomp> &_cpd, SpAlsRNGeng &_rngEng, size_t _nthread)
+TensorCP_SPALSOMP::TensorCP_SPALSOMP(const TensorDataSpAls &_data, shared_ptr<CPDecomp> &_cpd, SpAlsRNGeng *_rngEng, size_t _nthread)
     : TensorCP_SPALS(_data, _cpd, _rngEng), nthread(_nthread)
 {
     // get balance;
@@ -98,6 +98,17 @@ int TensorCP_SPALSOMP::updateFactor(const unsigned factorId, size_t count)
     vector<size_t> froms = SpAlsUtils::getFroms(factorId, cpd->dims.size());
     size_t hitR = 0;
     size_t hitNZ = 0;
+
+    //     vector<vector<vector<int>>> taskes(nthread, vector<vector<int>>(nthread));
+    //     vector<vector<vector<double>>> weights(nthread, vector<vector<double>>(nthread));
+
+    // #pragma omp parallel for reduction(+ : hitR, hitNZ)
+    //     for (int tid = 0; tid < nthread; ++tid)
+    //     {
+    //         vector<vector<int>> &taskT = taskes[tid];
+    //         vector<vector<double>> &weightsT = weights[tid];
+    //     }
+
     for (size_t iter = 0; iter < count; iter++)
     {
         // sample from krp
@@ -105,7 +116,7 @@ int TensorCP_SPALSOMP::updateFactor(const unsigned factorId, size_t count)
         for (auto &fid : froms)
         {
             // SpAlsUtils::printVector(factorCmf[fid]);
-            ps.push_back(SpAlsUtils::drawFromCmf(factorCmf[fid], rngEng.nextRNG()));
+            ps.push_back(SpAlsUtils::drawFromCmf(factorCmf[fid], rngEng->nextRNG()));
             if (verbose > 3)
                 cout << fid << "\t" << ps.back() << endl;
         }
@@ -169,21 +180,14 @@ int TensorCP_SPALSOMP::updateFactor(const unsigned factorId, size_t count)
 
 int TensorCP_SPALSOMP::updateFactor(const unsigned factorId)
 {
-    return updateFactorAls(factorId);
     size_t count = pow(rank, data.ro_dims.size() - 1) * rate;
-    if (verbose)
-        cout << " Sample : " << count << endl;
     for (int fid = 0; fid < data.ro_dims.size(); fid++)
     {
         if (fid != factorId)
         {
             count *= max(1, (int)(log(data.ro_dims[fid])));
-            if (verbose)
-                cout << " Sample : " << count << " fid: " << fid << " dim: " << data.ro_dims[fid] << endl;
         }
     }
-    if (verbose)
-        cout << " Sample : " << count << endl;
     return updateFactor(factorId, count);
 }
 

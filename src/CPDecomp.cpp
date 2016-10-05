@@ -32,6 +32,7 @@ void CPDecomp::randInit(RNGeng *rng)
 #pragma omp parallel for
     for (int factorId = 0; factorId < dims.size(); ++factorId)
     {
+        int tid = omp_get_thread_num();
         isFactorNormalized[factorId] = false;
         isGramUpdated[factorId] = false;
         isGramInvUpdated[factorId] = false;
@@ -40,7 +41,7 @@ void CPDecomp::randInit(RNGeng *rng)
         {
             for (size_t j = 0; j < rank; ++j)
             {
-                factors[factorId][i][j] = rng->nextRNG() - 0.5;
+                factors[factorId][i][j] = rng[tid].nextRNG() - 0.5;
             }
         }
         normalizeFactor(factorId);
