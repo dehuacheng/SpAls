@@ -16,7 +16,7 @@ class TensorData
 
   public:
     TensorData() : normT(-1), verbose(1), ro_loc(loc), ro_val(val), ro_nnz(nnz), ro_dims(dims) {}
-    TensorData(const char *filename);
+    TensorData(const char *filename, unsigned _verbose = 0);
 
     virtual void toFile(const char *filename);
     virtual void fromFile(const char *filename);
@@ -49,13 +49,12 @@ class TensorDataSpAls : public TensorData
 
   public:
     TensorDataSpAls() : TensorData(), isSorted(false), isCmfReady(false){};
-    TensorDataSpAls(const char *filename);
+    TensorDataSpAls(const char *filename, unsigned _verbose = 0);
 
     void toFile(const char *filename) override;
     void fromFile(const char *filename) override;
     void printData(int did = -1);
 
-    unsigned verbose;
     void sortIndexes();
     void findEntryFromFactor(const size_t factorId, const vector<size_t> &ps, int &start, int &end) const;
 

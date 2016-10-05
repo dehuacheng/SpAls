@@ -22,12 +22,12 @@ int main(int argc, char *argv[])
     size_t nthread = 8;
     omp_set_num_threads(nthread);
 
-    cout << inputFilename << endl;
+    cout << "loading data from: " << inputFilename << endl;
     TensorDataSpAls data(inputFilename.c_str());
-    data.verbose = 1;
-    data.printData();
+    data.verbose = 0;
+    data.printDataStats();
 
-    cout << data.normData() << endl;
+    // cout << data.normData() << endl;
     cout << "Sorting Indexes!" << endl;
     data.sortIndexes();
 
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
     cout << "TensorCP_ALs init done" << endl;
 
     als.setErrorRecordInterval(1);
-    als.setVerbose(1);
+    als.setVerbose(0);
     als.setRate(2.0);
     for (int iter = 0; iter < 3; iter++)
     {

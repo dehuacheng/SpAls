@@ -33,7 +33,6 @@ void CPDecomp::randInit(SpAlsRNGeng *rng)
     for (int factorId = 0; factorId < dims.size(); ++factorId)
     {
         int tid = omp_get_thread_num();
-        cout << "tid:" << tid << endl;
         isFactorNormalized[factorId] = false;
         isGramUpdated[factorId] = false;
         isGramInvUpdated[factorId] = false;
