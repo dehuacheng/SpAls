@@ -1,5 +1,4 @@
 #include "utils.h"
-#include "SpAlsLinalg.h"
 #include "TensorAls.h"
 #include "CPDecomp.h"
 #include "TensorData.h"
@@ -87,7 +86,7 @@ int TensorCP_ALS::updateFactor(const unsigned factorId)
 
     for (size_t i = 0; i < data.nnz; i++)
     {
-        updateEntry(factorId, froms, i, gramABpdtInv[factorId], 1.0);
+        updateEntry(factorId, froms, i, gramABpdtInv[factorId], 1.0, _row);
     }
 
     //postprocessing of the new factor
@@ -178,19 +177,18 @@ void TensorCP_ALS::prepareGramInv(const size_t factorId)
 }
 
 void TensorCP_ALS::updateEntry(const unsigned factorId, const vector<size_t> &froms,
-                               const size_t i, const vector<vector<T>> &gramABInv, const T weight)
+                               const size_t i, const vector<vector<T>> &gramABInv, const T weight, vector<T> &row)
 {
-    genRow(factorId, froms, data.loc[i], gramABInv);
+    genRow(factorId, froms, data.loc[i], gramABInv, row);
     for (size_t j = 0; j < rank; ++j)
     {
-        cpd->factors[factorId][data.loc[i][factorId]][j] += data.val[i] * _row[j] * weight;
+        cpd->factors[factorId][data.loc[i][factorId]][j] += data.val[i] * row[j] * weight;
     }
 }
 
-void TensorCP_ALS::genRow(const unsigned factorId, const vector<size_t> &froms, const vector<size_t> &_loci, const vector<vector<T>> &pinv)
+void TensorCP_ALS::genRow(const unsigned factorId, const vector<size_t> &froms, const vector<size_t> &_loci, const vector<vector<T>> &pinv, vector<T> &row)
 {
-
-    SpAlsUtils::reset(_row);
+    SpAlsUtils::reset(row);
     for (size_t j = 0; j < rank; j++)
     {
         T krpJ = 1.0;
@@ -200,7 +198,7 @@ void TensorCP_ALS::genRow(const unsigned factorId, const vector<size_t> &froms, 
         }
         for (size_t k = 0; k < rank; k++)
         {
-            _row[k] += pinv[k][j] * krpJ;
+            row[k] += pinv[k][j] * krpJ;
         }
     }
     return;

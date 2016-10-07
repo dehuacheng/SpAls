@@ -1,5 +1,7 @@
 #pragma once
 class TensorCP_ALS;
+class TensorCP_SPALS;
+class TensorCP_SPALSOMP;
 
 #include "pRNG.h"
 #include "utils.h"
@@ -46,14 +48,14 @@ class TensorCP_ALS
     chrono::time_point<chrono::system_clock> logBeforIter(const unsigned factorId);
 
     void prepareGramInv(const size_t factorId);
-    void updateEntry(const unsigned factorId, const vector<size_t> &froms, const size_t i, const vector<vector<T>> &gramABInv, const T weight);
-    void genRow(const unsigned factorId, const vector<size_t> &froms, const vector<size_t> &_loci, const vector<vector<T>> &pinv);
+    void updateEntry(const unsigned factorId, const vector<size_t> &froms, const size_t i, const vector<vector<T>> &gramABInv, const T weight, vector<T> &row);
+    void genRow(const unsigned factorId, const vector<size_t> &froms, const vector<size_t> &_loci, const vector<vector<T>> &pinv, vector<T> &row);
 };
 
 class TensorCP_SPALS : public TensorCP_ALS
 {
   public:
-    TensorCP_SPALS(const TensorDataSpAls &_data, shared_ptr<CPDecomp> &_cpd, SpAlsRNGeng &_rngEng);
+    TensorCP_SPALS(const TensorDataSpAls &_data, shared_ptr<CPDecomp> &_cpd, SpAlsRNGeng *_rngEng);
     virtual int updateFactor(const unsigned factorId, size_t count);
     virtual int updateFactor(const unsigned factorId);
     void setRate(double _rate);
@@ -61,10 +63,32 @@ class TensorCP_SPALS : public TensorCP_ALS
   protected:
     const TensorDataSpAls &dataSpals;
     double rate;
-    SpAlsRNGeng &rngEng;
+    SpAlsRNGeng *rngEng;
     // cmf for each factor
     vector<vector<T>> lvrgScores;
     vector<vector<T>> factorCmf;
 
     void getLvrgScr(const unsigned factorId);
+};
+
+class TensorCP_SPALSOMP : public TensorCP_SPALS
+{
+  public:
+    TensorCP_SPALSOMP(const TensorDataSpAls &_data, shared_ptr<CPDecomp> &_cpd, SpAlsRNGeng *_rngEng, size_t _nthread);
+    virtual int updateFactor(const unsigned factorId, size_t count);
+    virtual int updateFactor(const unsigned factorId);
+    virtual int updateFactorAls(const unsigned factorId);
+    const size_t nthread;
+
+  protected:
+    void getBalanceDist();
+    // required only when OpenMP
+    // without subsampling
+    vector<vector<vector<size_t>>> bDistALS;
+    // bDistALS[factorId][thread_id] is all the data_id that bDistSPALS[factorId][loc[thread_id][dimension_id]] = thread_id
+    // with subsampling
+    vector<vector<size_t>> bDistSPALS;
+    // bDistSPALS[factorId][dimension_id] = thread_id
+
+    vector<vector<T>> _rows;
 };

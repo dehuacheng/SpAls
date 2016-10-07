@@ -1,5 +1,4 @@
 #include "TensorData.h"
-#include "SpAlsLinalg.h"
 #include "utils.h"
 
 #include <iostream>
@@ -9,7 +8,7 @@
 
 using namespace std;
 
-TensorData::TensorData(const char *filename) : verbose(1), ro_loc(loc), ro_val(val), ro_nnz(nnz), ro_dims(dims)
+TensorData::TensorData(const char *filename, unsigned _verbose) : verbose(_verbose), ro_loc(loc), ro_val(val), ro_nnz(nnz), ro_dims(dims)
 {
     fstream fin;
     fin.open(filename, fstream::in);
@@ -133,6 +132,7 @@ void TensorData::printDataStats()
         cout << "Size of dim. " << i << ":\t" << dims[i] << endl;
     }
     cout << "NNZ in tensor: " << nnz << endl;
+    cout << "Fnorm^2 tensor: " << normData() << endl;
 }
 
 T TensorData::normData() const

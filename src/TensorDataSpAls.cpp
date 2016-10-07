@@ -9,7 +9,7 @@
 
 using namespace std;
 
-TensorDataSpAls::TensorDataSpAls(const char *filename) : TensorData(filename), isSorted(false), isCmfReady(false)
+TensorDataSpAls::TensorDataSpAls(const char *filename, unsigned _verbose) : TensorData(filename, _verbose), isSorted(false), isCmfReady(false)
 {
     dataCmf = vector<double>(nnz);
     SpAlsUtils::pdf2Cmf(val, dataCmf);

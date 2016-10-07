@@ -1,5 +1,7 @@
 #pragma once
 typedef double T;
+
+class Linalg;
 class RNGeng;
 class SpAlsRNGeng;
 class SpAlsUtils;
@@ -7,21 +9,28 @@ class SpAlsUtils;
 #include "pRNG.h"
 #include "asa007.h"
 #include <vector>
+#include "CPDecomp.h"
+#include "TensorData.h"
 
 using namespace std;
 
-class RNGeng
+class Linalg
 {
   public:
-    RNGeng() {}
-    virtual double nextRNG() = 0;
+    static double Fnorm2(const TensorData &data);
+    static double Fnorm2(CPDecomp &cpd);
+    static double Fnorm2Diff(const TensorData &data, CPDecomp &cpd);
 };
 
-class SpAlsRNGeng : public RNGeng
+class SpAlsRNGeng
 {
   public:
-    SpAlsRNGeng(sitmo::prng_engine _tmpeng) : tmpeng(_tmpeng) {}
-    double nextRNG() override;
+    SpAlsRNGeng(size_t seed = 0)
+    {
+        tmpeng.seed(seed);
+    }
+    double nextRNG();
+    void seed(size_t seed) { tmpeng.seed(seed); }
 
   protected:
     sitmo::prng_engine tmpeng;

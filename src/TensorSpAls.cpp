@@ -2,7 +2,6 @@
 #include "TensorAls.h"
 #include "CPDecomp.h"
 #include "TensorData.h"
-#include "SpAlsLinalg.h"
 
 #include <memory>
 #include <vector>
@@ -11,7 +10,7 @@
 
 using namespace std;
 
-TensorCP_SPALS::TensorCP_SPALS(const TensorDataSpAls &_data, shared_ptr<CPDecomp> &_cpd, SpAlsRNGeng &_rngEng)
+TensorCP_SPALS::TensorCP_SPALS(const TensorDataSpAls &_data, shared_ptr<CPDecomp> &_cpd, SpAlsRNGeng *_rngEng)
     : TensorCP_ALS(_data, _cpd), rngEng(_rngEng), rate(1.0), dataSpals(_data)
 {
     lvrgScores = vector<vector<T>>(data.ro_dims.size());
@@ -51,7 +50,7 @@ int TensorCP_SPALS::updateFactor(const unsigned factorId, size_t count)
         for (auto &fid : froms)
         {
             // SpAlsUtils::printVector(factorCmf[fid]);
-            ps.push_back(SpAlsUtils::drawFromCmf(factorCmf[fid], rngEng.nextRNG()));
+            ps.push_back(SpAlsUtils::drawFromCmf(factorCmf[fid], rngEng->nextRNG()));
             if (verbose > 3)
                 cout << fid << "\t" << ps.back() << endl;
         }
@@ -82,7 +81,7 @@ int TensorCP_SPALS::updateFactor(const unsigned factorId, size_t count)
             for (int i = start; i <= end; i++)
             {
                 int p = dataSpals.sortArgs[factorId][i];
-                updateEntry(factorId, froms, p, gramABpdtInv[factorId], weight);
+                updateEntry(factorId, froms, p, gramABpdtInv[factorId], weight, _row);
             }
         }
     }
