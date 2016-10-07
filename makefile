@@ -18,7 +18,10 @@ CFLAGS =  -O2 -std=c++11 -I"include" -fopenmp
 CPP_FILES := $(wildcard src/*.cpp)
 OBJ_FILES := $(addprefix obj/,$(notdir $(CPP_FILES:.cpp=.o)))
 
-all: $(OBJ_FILES)
+
+all: $(OBJ_FILES)	
+	mkdir -p obj
+	mkdir -p bin
 	${CC} $(LFLAGS) -o bin/main $^
 
 obj/%.o: src/%.cpp
