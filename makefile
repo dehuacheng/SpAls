@@ -16,15 +16,20 @@ endif
 CFLAGS =  -O2 -std=c++11 -I"include" -fopenmp
 
 CPP_FILES := $(wildcard src/*.cpp)
-OBJ_FILES := $(addprefix obj/,$(notdir $(CPP_FILES:.cpp=.o)))
+OBJ_DIR := obj
+OBJ_FILES := $(addprefix $(OBJ_DIR)/,$(notdir $(CPP_FILES:.cpp=.o)))
 
 
 all: $(OBJ_FILES)	
-	mkdir -p obj
 	mkdir -p bin
 	${CC} $(LFLAGS) -o bin/main $^
 
-obj/%.o: src/%.cpp
+$(OBJ_FILES) : | $(OBJ_DIR)
+
+$(OBJ_DIR):
+	mkdir -p $(OBJ_DIR)
+
+$(OBJ_DIR)/%.o: src/%.cpp
 	${CC} $(CFLAGS) -c -o $@ $<
 
 clean: 
